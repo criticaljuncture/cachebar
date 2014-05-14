@@ -42,6 +42,8 @@ module HTTParty
               retrieve_and_store_backup(httparty_response)
             end
           rescue *exceptions => e
+            raise e unless backups_enabled?
+
             if exception_callback && exception_callback.respond_to?(:call)
               exception_callback.call(e, redis_key_name, normalized_uri)
             end
