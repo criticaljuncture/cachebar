@@ -36,7 +36,7 @@ module HTTParty
             if httparty_response.response.is_a?(Net::HTTPSuccess)
               log_message("Storing good response in cache")
               store_in_cache(httparty_response.body)
-              store_backup(httparty_response.body)
+              store_backup(httparty_response.body) if backups_enabled?
               httparty_response
             else
               retrieve_and_store_backup(httparty_response)
@@ -56,8 +56,18 @@ module HTTParty
 
     protected
 
+    def backups_enabled?
+      true
+    end
+
+    def cache_enabled?
+      true
+    end
+
     def cacheable?
-      HTTPCache.perform_caching && HTTPCache.apis.keys.include?(uri.host) &&
+      cache_enabled? &&
+        HTTPCache.perform_caching &&
+        HTTPCache.apis.keys.include?(uri.host) &&
         http_method == Net::HTTP::Get
     end
 
@@ -113,6 +123,7 @@ module HTTParty
     end
 
     def backup_exists?
+      return false unless backups_enabled?
       redis.exists(backup_key) && redis.hexists(backup_key, uri_hash)
     end
 
