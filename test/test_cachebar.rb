@@ -106,7 +106,7 @@ class TestCacheBar < Test::Unit::TestCase
             exception_callback.expects(:call).with(instance_of(MultiJson::DecodeError), 'twitter', 'https://api.twitter.com/1/user_timeline.json').returns(true)
             HTTParty::HTTPCache.exception_callback = exception_callback
             mock_response_in_backup(@uri_hash)
-            
+
             TwitterAPI.bogus_resource
             HTTParty::HTTPCache.exception_callback = nil
           end
@@ -164,12 +164,12 @@ class TestCacheBar < Test::Unit::TestCase
             end
           end
         end
-      
+
         context 'with a post' do
           setup do
             VCR.insert_cassette('status_update_post')
           end
-          
+
           should 'never try to cache' do
             @redis.expects(:exists).never
             @redis.expects(:set).never
@@ -178,7 +178,7 @@ class TestCacheBar < Test::Unit::TestCase
             @redis.expects(:get).never
             TwitterAPI.update_status('viget', 'My new status.')
           end
-          
+
           teardown do
             VCR.eject_cassette
           end

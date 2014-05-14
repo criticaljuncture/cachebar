@@ -17,7 +17,7 @@ module TwitterAPI
     def bogus_resource
       get '/user_timeline.json'
     end
-    
+
     def update_status(username, new_status)
       # this is just for testing as this isn't really complient with API
       post '/statuses/update.json', :query => {

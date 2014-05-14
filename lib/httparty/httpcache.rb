@@ -2,11 +2,11 @@ module HTTParty
   module HTTPCache
     class NoResponseError < StandardError; end
 
-    mattr_accessor  :perform_caching, 
+    mattr_accessor  :perform_caching,
                     :apis,
-                    :logger, 
+                    :logger,
                     :redis,
-                    :timeout_length, 
+                    :timeout_length,
                     :cache_stale_backup_time,
                     :exception_callback
 
@@ -55,7 +55,7 @@ module HTTParty
     end
 
     protected
-    
+
     def cacheable?
       HTTPCache.perform_caching && HTTPCache.apis.keys.include?(uri.host) &&
         http_method == Net::HTTP::Get
@@ -128,7 +128,7 @@ module HTTParty
     def store_backup(response_body)
       redis.hset(backup_key, uri_hash, response_body)
     end
-    
+
     def redis_key_name
       HTTPCache.apis[uri.host][:key_name]
     end
