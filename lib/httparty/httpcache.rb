@@ -124,7 +124,7 @@ module HTTParty
 
     def backup_exists?
       return false unless backups_enabled?
-      redis.exists(backup_key) && redis.hexists(backup_key, uri_hash)
+      redis.hexists(backup_key, uri_hash)
     end
 
     def response_body_from_cache
