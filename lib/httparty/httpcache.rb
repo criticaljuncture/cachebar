@@ -60,13 +60,12 @@ module HTTParty
       true
     end
 
-    def cache_enabled?
+    def read_from_cache?
       true
     end
 
     def cacheable?
-      cache_enabled? &&
-        HTTPCache.perform_caching &&
+      HTTPCache.perform_caching &&
         HTTPCache.apis.keys.include?(uri.host) &&
         http_method == Net::HTTP::Get
     end
@@ -111,6 +110,7 @@ module HTTParty
     end
 
     def response_in_cache?
+      return false unless read_from_cache?
       redis.exists(cache_key_name)
     end
 
