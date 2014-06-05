@@ -8,17 +8,30 @@ module HTTParty
                     :redis,
                     :timeout_length,
                     :cache_stale_backup_time,
-                    :exception_callback
+                    :exception_callback,
+                    :read_from_cache,
+                    :backups_enabled
 
     self.perform_caching = false
     self.apis = {}
     self.timeout_length = 5 # 5 seconds
     self.cache_stale_backup_time = 300 # 5 minutes
+    self.read_from_cache = true
+    self.backups_enabled = true
 
     def self.included(base)
       base.class_eval do
         alias_method_chain :perform, :caching
       end
+    end
+
+    def self.reading_from_cache(read_from_cache=true)
+      existing_value = self.read_from_cache
+
+      self.read_from_cache = read_from_cache
+      yield
+    ensure
+      self.read_from_cache = existing_value
     end
 
     def perform_with_caching
@@ -36,13 +49,13 @@ module HTTParty
             if httparty_response.response.is_a?(Net::HTTPSuccess)
               log_message("Storing good response in cache")
               store_in_cache(httparty_response.body)
-              store_backup(httparty_response.body) if backups_enabled?
+              store_backup(httparty_response.body) if HTTPCache.backups_enabled
               httparty_response
             else
               retrieve_and_store_backup(httparty_response)
             end
           rescue *exceptions => e
-            raise e unless backups_enabled?
+            raise e unless HTTPCache.backups_enabled
 
             if exception_callback && exception_callback.respond_to?(:call)
               exception_callback.call(e, redis_key_name, normalized_uri)
@@ -57,14 +70,6 @@ module HTTParty
     end
 
     protected
-
-    def backups_enabled?
-      true
-    end
-
-    def read_from_cache?
-      true
-    end
 
     def cacheable?
       HTTPCache.perform_caching &&
@@ -112,7 +117,7 @@ module HTTParty
     end
 
     def response_in_cache?
-      return false unless read_from_cache?
+      return false unless HTTPCache.read_from_cache
       redis.exists(cache_key_name)
     end
 
@@ -125,7 +130,7 @@ module HTTParty
     end
 
     def backup_exists?
-      return false unless backups_enabled?
+      return false unless HTTPCache.backups_enabled
       redis.hexists(backup_key, uri_hash)
     end
 
