@@ -48,7 +48,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<redis>, [">= 0"])
       s.add_runtime_dependency(%q<redis-namespace>, [">= 0"])
-      s.add_runtime_dependency(%q<httparty>, ["~> 0.11.0"])
+      s.add_runtime_dependency(%q<httparty>, [">= 0.11.0"])
       s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
@@ -90,4 +90,3 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<SystemTimer>, [">= 0"])
   end
 end
-
