@@ -40,4 +40,4 @@ module CacheBar
 end
 
 HTTParty::ClassMethods.send(:include, CacheBar::ClassMethods)
-HTTParty::Request.send(:include, HTTParty::HTTPCache)
+HTTParty::Request.send(:prepend, HTTParty::HTTPCache)

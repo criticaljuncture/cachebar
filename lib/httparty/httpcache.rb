@@ -19,12 +19,6 @@ module HTTParty
     self.read_from_cache = true
     self.backups_enabled = true
 
-    def self.included(base)
-      base.class_eval do
-        alias_method_chain :perform, :caching
-      end
-    end
-
     def self.reading_from_cache(read_from_cache=true)
       existing_value = self.read_from_cache
 
@@ -34,7 +28,7 @@ module HTTParty
       self.read_from_cache = existing_value
     end
 
-    def perform_with_caching
+    def perform
       if cacheable?
         if response_in_cache?
           log_message("Retrieving response from cache")
@@ -43,7 +37,7 @@ module HTTParty
           validate
           begin
             httparty_response = timeout(timeout_length) do
-              perform_without_caching
+              super
             end
             httparty_response.parsed_response
             if httparty_response.response.is_a?(Net::HTTPSuccess)
@@ -65,7 +59,7 @@ module HTTParty
         end
       else
         log_message("Caching off")
-        perform_without_caching
+        super
       end
     end
 
